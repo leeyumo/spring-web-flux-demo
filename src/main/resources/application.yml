@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: webflux-demo
+  profiles:
+    active: dev
