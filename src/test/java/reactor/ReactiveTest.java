@@ -1,15 +1,19 @@
 package reactor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootTest
+@Slf4j
 public class ReactiveTest {
     private Flux<String> getZipDescFlux() {
         String desc = "Zip two sources together, that is to say wait for all the sources to emit one element and combine these elements once into a Tuple2.";
@@ -33,13 +37,16 @@ public class ReactiveTest {
 
     @Test
     public void testFlatMap(){
+//        Flux.just("flux", "mono")
+//                .flatMap(s -> Flux.fromArray(s.split("\\s*"))   // 1
+//                        .delayElements(Duration.ofMillis(100))) // 2
+////                .doOnNext()
+//                .subscribe();
         Flux.just("flux", "mono")
-                .flatMap(s -> Flux.fromArray(s.split("\\s*"))   // 1
-                        .delayElements(Duration.ofMillis(100))) // 2
-                .doOnNext(System.out::print)
+                .flatMap(s -> Mono.just(s+" modified"))
+                .doOnNext(System.out::println)
                 .subscribe();
-        Flux<Long> interval = Flux.interval(Duration.ofMillis(200));
-        System.out.println("finished");
+//        System.out.println("finished");
     }
 
     @Test
@@ -56,5 +63,15 @@ public class ReactiveTest {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         countDownLatch.countDown();
         System.out.println("finished");
+    }
+
+    @Test
+    public void testError(){
+        Flux.range(1, 6)
+                .map(i -> 10/(i-3))
+                .onErrorReturn(0)   // 1
+                .map(i -> i*i)
+//                .map(i-> i+1)
+                .subscribe(System.out::println, System.err::println);
     }
 }

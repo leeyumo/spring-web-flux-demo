@@ -32,10 +32,10 @@ public class DemoController {
         cityInfos.add(new CityInfo("伦敦", "5万平方米", "英国"));
         Flux<CityInfo> cityInfoFlux = Flux.fromIterable(cityInfos);
         cityInfoFlux.flatMap(cityInfo -> {
-            return Flux.just(cityInfo.getCityName()+"modify").delayElements(Duration.ofSeconds(2));
-        })
+                    return Mono.just(cityInfo.getCityName()+"modify").delayElement(Duration.ofSeconds(2));
+                })
                 .doOnComplete(() -> {log.info("finished");})
-        .subscribe(log::info);
+                .subscribe(log::info);
         return cityInfoFlux;
 
     }
