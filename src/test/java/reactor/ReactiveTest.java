@@ -43,10 +43,14 @@ public class ReactiveTest {
 ////                .doOnNext()
 //                .subscribe();
         Flux.just("flux", "mono")
-                .flatMap(s -> Mono.just(s+" modified"))
-                .doOnNext(System.out::println)
+                .flatMap(s -> Mono.just(s+" modified").delayElement(Duration.ofSeconds(1)))
+                .doOnNext(s -> System.out.println(s))
+                .doOnComplete(() -> {
+                    System.out.println("completed");
+                })
                 .subscribe();
-//        System.out.println("finished");
+        //查看控制台输出，体验异步，且非阻塞
+        System.out.println("finished");
     }
 
     @Test
